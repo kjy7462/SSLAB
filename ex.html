@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>큰 자리수와 낮은 자리수 같은지 비교</title>
+</head>
+<body>
+    <h2>큰 자리수와 닞은 자리수 같은지 비교</h2>
+    <hr>
+    <script>
+        let n =prompt("숫자를 입력하세요:")
+        if(isFinite(n)){
+        let res = parseInt(n);
+        if(res>0){
+            let small = res%10;
+            let big = 0;
+            while( res!=0){
+                big = res%10;
+                res =Math.floor(res/10);
+                        }
+        if(big==small)
+            document.write(n +":같습니다");
+        else{
+            document.write(n+"다릅니다.");}
+
+           }
+        else{
+            document.write(n+":음수나 0은 다루지 않습니다");
+            }
+        }
+        else{
+            document.write(n+":숫자가 아닙니다");
+            }
+    </script>
+</body>
+</html>
