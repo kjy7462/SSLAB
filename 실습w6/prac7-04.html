@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>월요일~토요일이면 배경색을 gold 일요일이면 pink</title>
+</head>
+<body>
+<h3>월요일~토요일이면 배경색을 gold 일요일이면 pink</h3>
+<hr>
+<script>
+let current = new Date(); // 현재 시간 값을 가진 Date 객체 생성
+if(current.getDay() >0 )
+	document.body.style.backgroundColor = "gold";
+else
+	document.body.style.backgroundColor = "pink";
+function getkor(a)
+{   let res;
+    switch(a)
+    {
+        case 0 : res ="일요";
+        case 1 : res ="월요";
+        case 2 : res ="화요";
+        case 3 : res ="수요";
+        case 4 : res ="목요";
+        case 5 : res ="금요";
+        case 6 : res ="토요";
+
+    }
+    return res;
+    
+}
+document.write("오늘 : ");
+document.write(current.getDate() + "일,");
+document.write(getkor(current.getDay()) + "일");
+
+</script>
+</body>
+</html>

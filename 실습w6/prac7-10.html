@@ -13,22 +13,18 @@
     <script>
     let i;
     let bookArray = new Array();
+    let newArray = new Array();
     for(i=0;i<5;i++){
     bookArray[i] = prompt("콤마(,)로 분리하면서 책제목 저자 가격 순으로 입력","");
         }
     for(i=0;i<5;i++){
     sp =bookArray[i].split(",");
-    class book{
-        constructor(){
-        this.title=sp[0];
-        this.author=sp[1];
-        this.price=sp[2];
+    let book = new Object();
+    book.title = sp[0];
+    book.author = sp[1];
+    book.price = sp[2];
+    newArray[i] = book;
         }
-    }
-        let s =new book(sp);
-        newArray[i]= s;
-    }
-        
         for(i=0;i<5;i++){
             document.write(newArray[i].title + ", ");
             document.write(newArray[i].author + ", ");
