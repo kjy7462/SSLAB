@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>아이템에 마우스를 올리면 설명 출력</title>
+    <script>
+        var list = ["자전거를 탄다",
+            "책을 읽는다",
+            "운동을 한다",
+            "코딩 연습"]
+        var Div;
+        function init() {
+            Div = document.getElementById("Div");
+            var li = document.getElementsByTagName("li"); 
+           
+            for (i = 0; i < li.length; i++) {
+                li[i].addEventListener("mouseover", over); 
+               
+                li[i].addEventListener("mouseout", out); 
+           
+            }
+        }
+        function over(e) {
+            var n = parseInt(e.target.id); 
+          
+            setDiv(list[n], e); 
+        
+        }
+        function setDiv(text, e) {
+            Div.innerHTML = text;
+            Div.style.left = e.x + "px"; 
+            
+            Div.style.top = e.y + "px"; 
+            Div.style.width = "100px";
+            Div.style.height = "50px";
+            Div.style.visibility = "visible"; 
+        
+            Div.style.background = "skyblue"; 
+            Div.style.border = "1px solid green";
+        }
+        function out() {
+            Div.style.visibility = "hidden"; 
+        
+        }
+    </script>
+</head>
+
+<body onload="init()">
+    <h3>아이템에 마우스를 올리면 설명 출력</h3>
+    <hr>
+    여름 방학 때 하고 싶은 것들
+    <ul>
+        <li id="0">자전거로 대한민국 일주</li>
+        <li id="1">책 100권 읽기</li>
+        <li id="2">철인 3종 경기 준비</li>
+        <li id="3">자바스크립트 정복</li>
+    </ul>
+    <div id="Div" style="position:absolute"></div>
+
+</body>
+
+</html>

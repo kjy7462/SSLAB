@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>계산기 만들기</title>
+    <style>
+        input{
+            width : 50px;
+            height : 20px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>계산기 만들기</h3>
+    <hr>
+    <input type="text" value="0" id="cal" style="width:250px"><br>
+    <input type="button" value="BACK" onclick="back()">
+    <input type="button" value="CE" onclick="ce()">
+    <input type="button" value="C" onclick="ce()">
+    <input type="button" value="=" onclick="calc()"><br>
+    <input type="button" value="7" onclick="val('7')">
+    <input type="button" value="8" onclick="val('8')">
+    <input type="button" value="9" onclick="val('9')">
+    <input type="button" value="/" onclick="val('/')"><br>
+    <input type="button" value="4" onclick="val('4')">
+    <input type="button" value="5" onclick="val('5')">
+    <input type="button" value="6" onclick="val('6')">
+    <input type="button" value="*" onclick="val('*')"><br>
+    <input type="button" value="1" onclick="val('1')">
+    <input type="button" value="2" onclick="val('2')">
+    <input type="button" value="3" onclick="val('3')">
+    <input type="button" value="-" onclick="val('-')"><br>
+    <input type="button" value="0" onclick="val('0')">
+    <input type="button" value="+" onclick="val('+')">
+    <input type="button" value="NONE">
+    <input type="button" value="NONE"> 
+   
+   
+    <script>
+        function calc(){
+            cal.value = eval(cal.value); 
+        }
+        function ce(){
+            cal.value = "0";
+        }
+        function back(){
+            cal.value = cal.value.substring(0, cal.value.length-1);  
+           
+        }
+        function val(n){
+            if(cal.value == "0"){
+                cal.value=""; 
+            }
+            cal.value = cal.value + n; 
+        }
+    </script>
+</body>
+
+</html>

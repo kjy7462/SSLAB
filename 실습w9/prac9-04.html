@@ -1,0 +1,27 @@
+<!doctype html> 
+<html> 
+<head> 
+<title>이미지 커서 만들기</title> 
+<style> 
+#mydiv{display:inline-block;width:30px;height:30px;position:absolute;}
+#im{display:inline-block;width:30px;height:30px;position:absolute;}
+</style> 
+</head> 
+<body onmousemove="ent(event)">
+<h3>마우스</h3> 
+<hr> 
+마우스를 움직이면 이미지로 만든 커서가 마우스를 따라다닙니다. 
+<div id="mydiv"><img src="media/shrek.png" id="im"></div>  
+<script> 
+let mydiv; 
+let im; 
+function ent(e){ 
+  mydiv=document.getElementById("mydiv"); 
+  im=document.getElementById("im"); 
+  mydiv.style.left=e.clientX + 'px';
+  mydiv.style.top= e.clientY + 'px';
+} 
+
+</script> 
+</body> 
+</html> 
