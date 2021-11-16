@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+table,th,td {
+  border : 1px solid black;
+  border-collapse: collapse;
+}
+th,td {
+  padding: 5px;
+}
+</style>
+</head>
+<body>
+    <h1>재난 정보</h1>
+<button type="button" onclick="loadDoc()">재난 정보 불러오기</button>
+<br><br>
+<table id="demo"></table>
+    <script>
+        function loadDoc(){
+var xhr = new XMLHttpRequest();
+var url = 'http://apis.data.go.kr/1741000/DisasterMsg3/getDisasterMsg1List'; /*URL*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+xhr.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+        myFunction(this.responseXML);
+    }
+};
+xhr.open('GET', url + queryParams);
+xhr.send('');
+        }
+function myFunction(xml) {
+  var i;
+  var xmlDoc = xml;
+  var table="<tr><th>지역</th><th>메시지</th></tr>";
+  var x = xmlDoc.getElementsByTagName("row");
+  for (i = 0; i <x.length; i++) { 
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("location_id")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("msg")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+  }
+  document.getElementById("demo").innerHTML = table;
+}
+
+</script>
+</body>
+</html>
