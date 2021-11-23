@@ -117,6 +117,10 @@ function startDataLayer() {
         // 지워주는 방법은
         // map.data._features 를 foreach 하면서 focus 끄시면 됩니다.
         if (feature.getProperty('focus') !== true) {
+              for(i = 0; i<map.data._features.length; i++) {
+                    map.data._features[i].setProperty('focus', false);
+                }
+                map.data.revertStyle();
            
                  var xhr = new XMLHttpRequest();
         var url = 'http://apis.data.go.kr/1741000/DisasterMsg4/getDisasterMsg2List'; /*URL*/
