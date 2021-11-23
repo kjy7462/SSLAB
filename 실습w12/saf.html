@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p id="demo"></p>
+    <p id="demo2"></p>
+<script type="text/javascript">
+let xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function () {
+	if(xhttp.readyState == 4 && xhttp.status == 200){
+		jsonfunc(this.responseText,xhttpa.responseText); //this = xhttp
+//		jsonfunc(xhttp.responseText); // 둘다 가능
+	}
+}
+xhttp.open("GET","LALO.json", true);
+xhttp.send();
+function jsonfunc( jsonText1,jsonText2 ) {
+
+	let json1 = JSON.parse(jsonText1); // String -> json으로 변환
+	let json2 = JSON.parse(jsonText2);
+	let txt = "";
+	// 접근법 1
+	for(i=0; i<json2.length; i++){
+		if(250==json2[i].LOCATION_ID)
+		{
+				txt += json2[i].LGDNG_CD + " " + "<br>"; 
+				for(j=0; j<json1.length; j++)
+		{		if(json2[i].LGDNG_CD==json1[j].LGDNG_CD)
+				txt += json1[j].LA + " " + "<br>"; 
+				
+		}
+		}
+		
+			}
+	
+	
+	document.getElementById('demo').innerHTML = txt;
+}
+let xhttpa = new XMLHttpRequest();
+xhttpa.open("GET","LIDtoLCD.json", true);
+xhttpa.send();
+</script>
+</body>
+</html>

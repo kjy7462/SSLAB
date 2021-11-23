@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>table,th,td {
+  border : 1px solid black;
+  border-collapse: collapse;
+}
+th,td {
+  padding: 5px;
+}</style>
+</head>
+<body>
+    <button type="button" onclick="loadDoc()">재난 정보 불러오기</button>
+    <table id="demo"></table>
+    <script>
+    var xhr = new XMLHttpRequest();
+    function loadDoc(){
+    var url = 'http://apis.data.go.kr/1741000/DisasterMsg4/getDisasterMsg2List'; /*URL*/
+    var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+    queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+    queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+    queryParams += '&' + encodeURIComponent('create_date') + '=' + encodeURIComponent('2021/11/23 00:00:00'); /**/
+    queryParams += '&' + encodeURIComponent('location_name') + '=' + encodeURIComponent('제주특별자치도'); /**/
+    xhr.open('GET', url + queryParams);
+    xhr.onreadystatechange = function () {
+        if (this.readyState == 4) {
+        myFunction(this);
+    }
+}
+xhr.send();};
+function myFunction(xml) {
+  var i;
+  var xmlDoc = xml.responseXML;
+  var table="<tr><th>지역</th><th>메시지</th></tr>";
+  var x = xmlDoc.getElementsByTagName("row");
+  for (i = 0; i <x.length; i++) { 
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("location_name")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("msg")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+  }
+  document.getElementById("demo").innerHTML = table;
+}
+    </script>
+</body>
+</html>
