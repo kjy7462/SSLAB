@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>재난 지도</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+     <style>
+         body {
+  margin: 0;
+  font-family: "Open Sans", sans-serif;
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  border:4px;
+}
+
+
+      table{
+             width: 63%;
+           
+             justify-content:stretch;
+         }
+     table,th,td {
+             border : 1px solid white;
+             border-collapse: collapse;
+             color: white;
+             border-color:#1a1f2b;
+             font-size:12px;
+                        }
+            th,td {
+             padding: 5px;
+             background-color:#282b37;
+    
+                }
+                td:hover{
+                    background:#636fdd;
+                }
+    body {
+        background-color: #111420;
+    }                
+    h2{
+        color: white;
+    }
+         #bt1{
+            margin-right: -4px;
+            border-top-left-radius:5px;
+            border-bottom-left-radius:5px;
+
+        }
+      
+        #bt3{
+            margin-left: -3px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        #btGroup button{
+            border: 1px solid skyblue;
+            background-color:rgba(0,0,0,0) ;
+            color:skyblue;
+            padding:5px;
+
+        }
+        #btGroup button:hover{
+            color:white;
+            background-color:skyblue;
+        }
+    </style>
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> 
+    <!-- naver map -->
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=a3f4wwxyre&submodules=geocoder"></script>
+    <!-- chart js-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<h2>재난 정보 웹사이트</h2>
+<hr>
+<div id="map" style=width:80%;height:400px;"></div>
+<hr>
+
+<div id=btGroup>
+        <button id=bt1 onclick="loadDoc1()">시도별 코로나 확진자</button>
+        <button id=bt2 onclick="loadDoc2()">일자별 코로나 확진자</button>
+        <button id=bt3 onclick="loadDoc3()">누적 검사수/확진수</button>
+    </div>
+    <div id="asd"></div>
+    <table id="table"></table>
+    <p><table id='table2'></table></p>
+    
+        
+   
+<!--추가 데이터 표시 -->
+<script>
+    var dump;
+var infowindow = new naver.maps.InfoWindow();
+function onSuccessGeolocation(position) {
+    var location = new naver.maps.LatLng(position.coords.latitude,
+                                         position.coords.longitude);
+    naver.maps.Service.reverseGeocode({
+        location: new naver.maps.LatLng(position.coords.latitude, position.coords.longitude),
+    }, function(status, response) {
+        if (status !== naver.maps.Service.Status.OK) {
+            return alert('Something wrong!');
+        }
+
+        var result = response.result, // 검색 결과의 컨테이너
+            items = result.items; // 검색 결과의 배열
+            dump = items;
+            var xhr2 = new XMLHttpRequest();
+        var url2 = 'http://apis.data.go.kr/1741000/DisasterMsg4/getDisasterMsg2List'; /*URL*/
+        var queryParams2 = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+        queryParams2 += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+        queryParams2 += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+        queryParams2 += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+        queryParams2 += '&' + encodeURIComponent('create_date') + '=' + encodeURIComponent('2021/11/30 00:00:00'); /**/
+        queryParams2 += '&' + encodeURIComponent('location_name') + '=' + encodeURIComponent(dump[0].addrdetail.sido); /**/
+        xhr2.open('GET', url2 + queryParams2);
+        xhr2.onreadystatechange = function () {
+         if (this.readyState == 4) {
+             myFunction(this);
+        
+    }
+};
+function myFunction(xml){
+     var xmlDoc = xml.responseXML;
+  var table="<tr><th>현재 위치의 재난 문자</th></tr>";
+  var x = xmlDoc.getElementsByTagName("row");
+  for (i = 0; i <x.length; i++) { 
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("msg")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+  }
+  document.getElementById("table2").innerHTML = table;
+}
+        
+xhr2.send('');
+       
+        });
+        // do Something
+    
+    map.setCenter(location); // 얻은 좌표를 지도의 중심으로 설정합니다.
+    map.setZoom(7); // 지도의 줌 레벨을 변경합니다.
+
+    infowindow.setContent('<div style="padding:20px; background-color:white;">' + ' 현재 위치' + '</div>');
+
+    infowindow.open(map, location);
+    console.log('Coordinates: ' + location.toString());
+}
+
+function onErrorGeolocation() {
+    var center = map.getCenter();
+
+    infowindow.setContent('<div style="padding:20px;">' +
+        '<h5 style="margin-bottom:5px;color:#f00;">Geolocation failed!</h5>'+ "latitude: "+ center.lat() +"<br />longitude: "+ center.lng() +'</div>');
+
+    infowindow.open(map, center);
+}
+
+$(window).on("load", function() {
+    if (navigator.geolocation) {
+        /**
+         * navigator.geolocation 은 Chrome 50 버젼 이후로 HTTP 환경에서 사용이 Deprecate 되어 HTTPS 환경에서만 사용 가능 합니다.
+         * http://localhost 에서는 사용이 가능하며, 테스트 목적으로, Chrome 의 바로가기를 만들어서 아래와 같이 설정하면 접속은 가능합니다.
+         * chrome.exe --unsafely-treat-insecure-origin-as-secure="http://example.com"
+         */
+        navigator.geolocation.getCurrentPosition(onSuccessGeolocation, onErrorGeolocation);
+    } else {
+        var center = map.getCenter();
+        infowindow.setContent('<div style="padding:20px;"><h5 style="margin-bottom:5px;color:#f00;">Geolocation not supported</h5></div>');
+        infowindow.open(map, center);
+    }
+});
+
+
+</script>
+<!--ㅡmap데이터 그리기-->
+<script>
+var HOME_PATH = "https://navermaps.github.io/maps.js/docs",
+    urlPrefix = HOME_PATH +'/data/region',
+    urlSuffix = '.json',
+    regionGeoJson = [],
+    loadCount = 0;
+
+var map = new naver.maps.Map(document.getElementById('map'), {
+    zoom: 7,
+    mapTypeId: 'normal',
+    center: new naver.maps.LatLng(36.4203004, 128.317960)
+});
+//현재 위치 받아오기
+
+// 지도가 로드된 다음에 일회성으로 실행되는 이벤트
+naver.maps.Event.once(map, 'init_stylemap', function () {
+    for (var i = 1; i < 18; i++) {
+        var keyword = i +'';
+
+        if (keyword.length === 1) {
+            keyword = '0'+ keyword;
+        }
+        // 01, 02, 03 생성
+
+        $.ajax({
+            url: urlPrefix + keyword + urlSuffix,
+            success: function(idx) {
+                return function(geojson) {
+                    regionGeoJson[idx] = geojson;
+
+                    loadCount++;
+                    // 17개 다 받아오면 그리기 시작
+                    if (loadCount === 17) {
+                        startDataLayer();
+                    }
+                }
+            }(i - 1)
+        });
+    }
+});
+var tooltip = $('<div style="position:absolute;z-index:1000;padding:5px 10px;background-color:#fff;border:solid 2px #000;font-size:14px;pointer-events:none;display:none;"></div>');
+tooltip.appendTo(map.getPanes().floatPane);
+function myFunction(xml) {
+  var i;
+  var xmlDoc = xml.responseXML;
+  var table="<tr><th>지역</th><th>메시지</th></tr>";
+  var x = xmlDoc.getElementsByTagName("row");
+  for (i = 0; i <x.length; i++) { 
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("location_name")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("msg")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+  }
+  document.getElementById("table").innerHTML = table;
+     
+}
+function startDataLayer() {
+
+    map.data.setStyle(function(feature) {
+        
+        // 기본 라인 
+        var styleOptions = {
+            fillColor: '#ff0000',
+            fillOpacity: 0.0001,
+            strokeColor: '#ff0000',
+            strokeWeight: 2,
+            strokeOpacity: 0.4
+        };
+
+        // 마우스 올라갔을 떄 스타일
+        if (feature.getProperty('focus')) {
+            styleOptions.fillOpacity = 0.6;
+            styleOptions.fillColor = '#0f0';
+            styleOptions.strokeColor = '#0f0';
+            styleOptions.strokeWeight = 4;
+            styleOptions.strokeOpacity = 1;
+        }
+
+        return styleOptions;
+    });
+   
+    // 제가 받아온 Geojson파일을 map.data
+    regionGeoJson.forEach(function(geojson) {
+        map.data.addGeoJson(geojson);
+         dump = geojson;
+    });
+// 초기 재난 문자 표시
+
+    map.data.addListener('click', function(e) {
+        var feature = e.feature;
+        if (feature.getProperty('focus') !== true) {
+              for(i = 0; i<map.data._features.length; i++) {
+                    map.data._features[i].setProperty('focus', false);
+                }
+                map.data.revertStyle();
+           
+        var xhr = new XMLHttpRequest();
+        var url = 'http://apis.data.go.kr/1741000/DisasterMsg4/getDisasterMsg2List'; /*URL*/
+        var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+        queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('xml'); /**/
+        queryParams += '&' + encodeURIComponent('create_date') + '=' + encodeURIComponent('2021/11/30 00:00:00'); /**/
+        queryParams += '&' + encodeURIComponent('location_name') + '=' + encodeURIComponent(feature.getProperty('area1')); /**/
+        xhr.open('GET', url + queryParams);
+        xhr.onreadystatechange = function () {
+         if (this.readyState == 4) {
+             myFunction(this);
+        
+    }
+};
+        
+xhr.send('');
+            feature.setProperty('focus', true);
+        } else {
+            feature.setProperty('focus', false);
+        }
+    });
+
+
+    map.data.addListener('mouseover', function(e) {
+        
+        // 이름을 받아
+        var feature = e.feature,
+            regionName = feature.getProperty('area1');
+            // 강원도
+
+        // 지역명 뜨는거 
+        tooltip.css({
+            display: '',
+            left: e.offset.x,
+            top: e.offset.y
+        }).text(regionName);
+
+        map.data.overrideStyle(feature, {
+            fillOpacity: 0.6,
+            strokeWeight: 4,
+            strokeOpacity: 1
+        });
+    });
+
+    map.data.addListener('mouseout', function(e) {
+        // 툴팁 사라지게 하고
+        tooltip.hide().empty();
+
+        // 스타일 원상복귀시키는
+        map.data.revertStyle();
+    });
+}
+</script>
+<!--확진수 표시-->
+<script>
+function loadDoc3(){
+var p = document.getElementById("asd");
+            var newDiv = document.createElement("div");
+            newDiv.style.backgroundColor= "#1a1f2b";
+            newDiv.style.width="500px";
+            newDiv.style.height="500px";
+            newDiv.setAttribute("id","chart3");
+            p.appendChild(newDiv);
+            var chart = document.createElement("canvas");
+            var div = document.getElementById("chart3");
+            chart.setAttribute("id","myChart3");
+            div.appendChild(chart);
+             div.addEventListener("click", function()
+            {
+                var p = document.getElementById("asd");
+                p.removeChild(this);
+            })
+var xhr = new XMLHttpRequest();
+var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson'; /*URL*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent('20211206'); /**/
+queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent('20211206'); /**/
+xhr.open('GET', url + queryParams);
+xhr.onreadystatechange = function () {
+    if (this.readyState == 4) {
+        drawChart(this.responseXML);
+    }
+};
+
+xhr.send('');
+
+function drawChart(xml){
+        var i;
+        var xmlDoc = xml;
+        var x = xmlDoc.getElementsByTagName("item");
+    new Chart(document.getElementById("myChart3"), {
+    type: 'pie',
+    data: {
+      labels: ["누적 검사수", "확진수",],
+      datasets: [{
+        label: "명",
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        data: [x[0].getElementsByTagName("accExamCnt")[0].childNodes[0].nodeValue,x[0].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue]
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: '누적검사수/확진수'
+      }
+    }
+});}
+function totalCnt(xml){
+    var i;
+    var xmlDoc = xml;
+    var table = "<tr><th>날짜</th><th>누적검사수</th><th>누적확진수</th><th>사망자수</th></tr>";
+    var x = xmlDoc.getElementsByTagName("item");
+    for( i=0; i<x.length; i++){
+    table += "<tr><td>" +
+    x[i].getElementsByTagName("updateDt")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("accExamCnt")[0].childNodes[0].nodeValue + 
+    "</td><td>" +
+    x[i].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue +
+    "</td><td>" +
+    x[i].getElementsByTagName("deathCnt")[0].childNodes[0].nodeValue +
+    "</td></tr>";
+    }
+ document.getElementById("demo").innerHTML = table;
+}
+}
+</script>
+<!--chart 표시-->
+<script>
+    
+function loadDoc1(){
+          
+        var p = document.getElementById("asd");
+            var newDiv = document.createElement("div");
+            newDiv.style.backgroundColor= "#1a1f2b";
+            newDiv.style.width="500px";
+            newDiv.style.height="30%";
+            newDiv.setAttribute("id","chart1");
+            p.appendChild(newDiv);
+            var chart = document.createElement("canvas");
+            var div = document.getElementById("chart1");
+            chart.setAttribute("id","myChart1");
+            div.appendChild(chart);
+             div.addEventListener("click", function()
+            {
+                var p = document.getElementById("asd");
+                p.removeChild(this);
+
+            })
+var xhr = new XMLHttpRequest();
+var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson'; 
+var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'yEtPvQDpi1M7xHUZyq%2B8LRHuSiGor4%2BxMbK2ccETbfF%2FiMwcnNNCE0Md9VcCHxC1XC%2BH8HEiyDq15SAEZbX27g%3D%3D'; /*Service Key*/
+queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent('20211206'); /**/
+queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent('20211210'); /**/
+xhr.open('GET', url + queryParams);
+xhr.onreadystatechange = function () {
+    if (this.readyState == 4) {
+        drawChart(this.responseXML);
+    }
+};
+
+xhr.send('');
+
+   function drawChart(xml){
+  var context = document
+                .getElementById('myChart1')
+                .getContext('2d');
+            var i;
+            var xmlDoc = xml;
+            var x = xmlDoc.getElementsByTagName("item");
+            var set;
+            var myChart = new Chart(context, {
+
+            
+                type: 'bar', // 차트의 형태
+                data: { // 차트에 들어갈 데이터
+                    labels: [
+                        //x 축
+                       x[1].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[2].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[3].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[4].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[5].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[6].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[7].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[8].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[9].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[10].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[11].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[12].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[13].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[14].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[15].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[16].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[17].getElementsByTagName("gubun")[0].childNodes[0].nodeValue,
+                       x[18].getElementsByTagName("gubun")[0].childNodes[0].nodeValue
+                    ],
+                    datasets: [
+                        { //데이터
+                            label: '시도별 확진 현황', //차트 제목
+                            fill: false, // line 형태일 때, 선 안쪽을 채우는지 안채우는지
+                            data: [
+                       x[1].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[2].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[3].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[4].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[5].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[6].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[7].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[8].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[9].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[10].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[11].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[12].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[13].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[14].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[15].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[16].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[17].getElementsByTagName("incDec")[0].childNodes[0].nodeValue,
+                       x[18].getElementsByTagName("incDec")[0].childNodes[0].nodeValue //x축 label에 대응되는 데이터 값
+                            ],
+                            backgroundColor: [
+                                //색상
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderColor: [
+                                //경계선 색상
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 2 //경계선 굵기
+                        }/* ,
+                        {
+                            label: 'test2',
+                            fill: false,
+                            data: [
+                                8, 34, 12, 24
+                            ],
+                            backgroundColor: 'rgb(157, 109, 12)',
+                            borderColor: 'rgb(157, 109, 12)'
+                        } */
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxes: [
+                            {
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+            }}
+</script>
+<!--chart2 일자별 코로나 확진자 표시-->
+<script>
+    function loadDoc2(){
+
+         var p = document.getElementById("asd");
+            var newDiv = document.createElement("div");
+            newDiv.style.backgroundColor= "#1a1f2b";
+            newDiv.style.width="500px";
+            newDiv.style.height="30%";
+            newDiv.setAttribute("id","chart2");
+            p.appendChild(newDiv);
+            var chart = document.createElement("canvas");
+            var div = document.getElementById("chart2");
+            chart.setAttribute("id","myChart2");
+            div.appendChild(chart);
+            div.addEventListener("click", function()
+            {
+                var p = document.getElementById("asd");
+                p.removeChild(this);
+            })
+  var today = new Date();
+
+var year = today.getFullYear();
+var month = ('0' + (today.getMonth() + 1)).slice(-2);
+var day = ('0' + today.getDate()).slice(-2);
+
+var dateString = year +  month  + day;
+var xhr = new XMLHttpRequest();
+var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson'; /*URL*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
+queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent('20211203'); /**/
+queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent(dateString); /**/
+xhr.open('GET', url + queryParams);
+xhr.onreadystatechange = function () {
+    if (this.readyState == 4) {
+        drawChart(this.responseXML);
+    }
+};
+xhr.send('');
+function drawChart(xml){
+    var i;
+    var xmlDoc = xml;
+    var x = xmlDoc.getElementsByTagName("item");
+     var context = document
+                .getElementById('myChart2')
+                .getContext('2d');
+            var myChart = new Chart(context, {
+                type: 'bar', // 차트의 형태
+                data: { // 차트에 들어갈 데이터
+                    labels: [
+                        //x 축
+                        x[6].getElementsByTagName("stateDt")[0].childNodes[0].nodeValue,
+                        x[5].getElementsByTagName("stateDt")[0].childNodes[0].nodeValue,
+                        x[4].getElementsByTagName("stateDt")[0].childNodes[0].nodeValue,
+                        x[3].getElementsByTagName("stateDt")[0].childNodes[0].nodeValue,
+                        x[2].getElementsByTagName("stateDt")[0].childNodes[0].nodeValue,
+                        x[1].getElementsByTagName("stateDt")[0].childNodes[0].nodeValue
+                    ],
+                    datasets: [
+                        { //데이터
+                            label: '일별 확진자수 추이', //차트 제목
+                            fill: false, // line 형태일 때, 선 안쪽을 채우는지 안채우는지
+                            data: [
+                                x[5].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue- x[6].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue,
+                                x[4].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue- x[5].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue,
+                                x[3].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue- x[4].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue,
+                                x[2].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue- x[3].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue,
+                                x[1].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue- x[2].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue,
+                                x[0].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue- x[1].getElementsByTagName("decideCnt")[0].childNodes[0].nodeValue
+                                
+                                //x축 label에 대응되는 데이터 값
+                            ],
+                            backgroundColor: [
+                                //색상
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)'
+                            ],
+                            borderColor: [
+                                //경계선 색상
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(54, 162, 235, 1)'
+                            ],
+                            borderWidth: 1 //경계선 굵기
+                        }/* ,
+                        {
+                            label: 'test2',
+                            fill: false,
+                            data: [
+                                8, 34, 12, 24
+                            ],
+                            backgroundColor: 'rgb(157, 109, 12)',
+                            borderColor: 'rgb(157, 109, 12)'
+                        } */
+                    ]
+                },
+                options: {
+                    scales: {
+                        yAxes: [
+                            {
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+}}
+</script>
+</body>
+</html>
