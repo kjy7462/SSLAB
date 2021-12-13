@@ -347,13 +347,20 @@ var p = document.getElementById("asd");
                 var p = document.getElementById("asd");
                 p.removeChild(this);
             })
+              var today = new Date();
+
+var year = today.getFullYear();
+var month = ('0' + (today.getMonth() + 1)).slice(-2);
+var day = ('0' + today.getDate()).slice(-2);
+
+var dateString = year + month + day;
 var xhr = new XMLHttpRequest();
 var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson'; /*URL*/
 var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
 queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent('20211206'); /**/
-queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent('20211206'); /**/
+queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent(dateString); /**/
 xhr.open('GET', url + queryParams);
 xhr.onreadystatechange = function () {
     if (this.readyState == 4) {
@@ -426,13 +433,20 @@ function loadDoc1(){
                 p.removeChild(this);
 
             })
+              var today = new Date();
+
+var year = today.getFullYear();
+var month = ('0' + (today.getMonth() + 1)).slice(-2);
+var day = ('0' + today.getDate()).slice(-2);
+
+var dateString = year + month + day;
 var xhr = new XMLHttpRequest();
 var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19SidoInfStateJson'; 
 var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'yEtPvQDpi1M7xHUZyq%2B8LRHuSiGor4%2BxMbK2ccETbfF%2FiMwcnNNCE0Md9VcCHxC1XC%2BH8HEiyDq15SAEZbX27g%3D%3D'; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
 queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent('20211206'); /**/
-queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent('20211210'); /**/
+queryParams += '&' + encodeURIComponent('endCreateDt') + '=' + encodeURIComponent(dateString); /**/
 xhr.open('GET', url + queryParams);
 xhr.onreadystatechange = function () {
     if (this.readyState == 4) {
@@ -596,10 +610,10 @@ var year = today.getFullYear();
 var month = ('0' + (today.getMonth() + 1)).slice(-2);
 var day = ('0' + today.getDate()).slice(-2);
 
-var dateString = year +  month  + day;
+var dateString = year + month + day;
 var xhr = new XMLHttpRequest();
 var url = 'http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson'; /*URL*/
-var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'2ZSbBC4e0F%2F9ztmIBRElfIffXDFvwq8CehCCCy31U7kDjdQtHmvSsULFeFq%2B7ias4IKEl59W2Ygq0MMXY2PPaw%3D%3D'; /*Service Key*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'yEtPvQDpi1M7xHUZyq%2B8LRHuSiGor4%2BxMbK2ccETbfF%2FiMwcnNNCE0Md9VcCHxC1XC%2BH8HEiyDq15SAEZbX27g%3D%3D'; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); /**/
 queryParams += '&' + encodeURIComponent('startCreateDt') + '=' + encodeURIComponent('20211203'); /**/
@@ -608,6 +622,8 @@ xhr.open('GET', url + queryParams);
 xhr.onreadystatechange = function () {
     if (this.readyState == 4) {
         drawChart(this.responseXML);
+        
+
     }
 };
 xhr.send('');
